@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+import csv
 
 class Contact:
 
@@ -17,6 +16,7 @@ class ContactBook:
     def add(self, name, phone, email):
         contact = Contact(name, phone, email)
         self._contacts.append(contact)
+        self._save()
 
     def show_all(self):
         for contact in self._contacts:
@@ -26,6 +26,7 @@ class ContactBook:
         for idx, contact in enumerate(self._contacts):
             if contact.name.lower() == name.lower():
                 del self._contacts[idx]
+                self._save()
                 break
 
     def search(self, name):
@@ -45,6 +46,17 @@ class ContactBook:
         else:
             self._not_found()
 
+    def _save(self):
+        with open('contactos.csv', 'w',encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow( ('name', 'phone', 'email') )
+
+            for contact in self._contacts:
+                writer.writerow((contact.name, contact.phone, contact.email))
+                                      
+
+
+
     def _print_contact(self, contact):
         print('--- * --- * --- * --- * --- * --- * --- * ---')
         print('Nombre: {}'.format(contact.name))
@@ -61,6 +73,17 @@ class ContactBook:
 def run():
 
     contact_book = ContactBook()
+
+    with open('contactos.csv', 'r', encoding="utf-8") as f:
+        reader = csv.reader(f)
+        for idx, row in enumerate(reader):
+            if idx == 0:
+                continue
+            try:
+                contact_book.add(row[0], row[1], row[2])
+            except IndexError:
+                print('Archivo Bacio')
+            
 
     while True:
         command = str(input('''
